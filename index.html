@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="ico/favicon.png">
+    <title>Starter Template for Bootstrap</title>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+        .bs-old-docs
+        {
+            padding: 15px 20px;
+            color: #777;
+            background-color: #fafafa;
+            border-top: 1px solid #fff;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .bs-glyphicons
+        {
+            padding-left: 0;
+            padding-bottom: 1px;
+            margin-bottom: 20px;
+            list-style: none;
+            overflow: hidden;
+        }
+        .bs-glyphicons li
+        {
+            width: 12.5%;
+        }
+        .bs-glyphicons li
+        {
+            float: left;
+            width: 100px;
+            height: 100px;
+            padding: 10px;
+            margin: 0 -1px -1px 0;
+            font-size: 12px;
+            line-height: 1.4;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .bs-glyphicons li:hover
+        {
+            background-color: rgba(86,61,124,.1);
+        }
+        .bs-glyphicons .glyphicon
+        {
+            margin-top: 5px;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .glyphicon:empty
+        {
+            width: 1em;
+        }
+        .glyphicon
+        {
+            position: relative;
+            top: 1px;
+            display: inline-block;
+            font-family: 'Glyphicons Halflings';
+            -webkit-font-smoothing: antialiased;
+            font-style: normal;
+            font-weight: normal;
+            line-height: 1;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .bs-glyphicons .glyphicon-class
+        {
+            display: block;
+            text-align: center;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span><span
+                        class="icon-bar"></span><span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Gmaps Icons</a>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </div>
+    <div class="container" style="padding-top: 60px">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="panel panel-default">
+                    <!-- Default panel contents -->
+                    <div class="panel-heading">
+                        <strong>Google Map icons</strong></div>
+                    <!-- Table -->
+                    <table class="table" id="tableid">
+                        <thead>
+                        </thead>
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="control-group" id="divtxticonurl" style="display:none">
+                    <label class="control-label" for="txticonurl">
+                        Google map icon url</label>
+                    <div class="controls">
+                        <input type="text" class="form-control" placeholder="Icon Url" id="txticonurl" style="display: none" />
+                    </div>
+                </div>
+                <br />
+                <div class="row" id="iconsdiv">
+                    <div class="col-md-12 icons" id="dvIconPlaces">
+                        <ul class="bs-glyphicons" id="ulIconPlaces">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="application/javascript">
+        var idforicons;
+        $(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "icon-attributes.json",
+                    contentType: "application/json",
+                    dataType: "json",
+                    cache: false,
+                    success: gmapiconsuccess,
+                    error: gmapiconfailure
+                });
+            });
+
+        function gmapiconsuccess(res) {
+            //fr population the table with icon names
+            var Namesfortd = res.aaData.Names[0].MapNames.split(',');
+            var classNamesfortd = res.aaData.Names[0].ClassNames.split(',');
+            jQuery.each(classNamesfortd, function (index, value) {
+                var placesList = '<tr><td class="' + value + '"> ' + Namesfortd[index] + '</td></tr>';
+                $("#tableBody").append(placesList); 
+            });
+
+            //for population the divs with icons
+            $('td').click(function () {
+                var idforicons = $(this).attr("class");
+                var urlForIcons = res.aaData[idforicons][0].url;
+                var allprefix = res.aaData[idforicons][0].prefix.split(',');
+                $("#ulIconPlaces").html("");
+                $("#txticonurl").val("");
+                jQuery.each(allprefix, function (i, val) {
+                    var placesList = '<li><img src="' + urlForIcons + val + '.png"/>' + '<span class="glyphicon-class">' + val + '</span></li>';
+                    $("#ulIconPlaces").append(placesList);
+                });
+            });
+        }
+        $('#iconsdiv').on('click', 'li', function () {
+            var src = $("img", this).prop("src");
+            $("#divtxticonurl").show();
+            $("#txticonurl").show().val(src); // id of clicked li by directly accessing DOMElement property
+        });
+        function gmapiconfailure() {
+            console.log("disable the security in chrome");
+            console.log("chrome.exe --disable-web-security");
+            }
+  </script>
+</body>
+</html>
